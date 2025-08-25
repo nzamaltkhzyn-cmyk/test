@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الخزنة</title>
+    <title>الخزنة - مدير الملفات</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-
-    <!-- Stylesheet (New Mobile-First Design) -->
-    <link rel="stylesheet" href="mobile-style.css"> <!-- Changed stylesheet link -->
-
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="mobile-style.css">
     <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Icon Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="theme-light">
 
-    <!-- 1. شاشة المصادقة (تسجيل الدخول / حساب جديد) -->
+    <!-- 1. شاشة المصادقة -->
     <div id="auth-view" class="view">
         <div class="auth-container glassmorphism-card">
             <div id="login-form-container">
@@ -47,36 +47,35 @@
             <h1>الخزنة</h1>
             <div class="header-controls">
                 <input type="search" id="search-input" placeholder="ابحث في المجلدات...">
-                <button id="theme-toggle" class="secondary-btn">تبديل الوضع</button>
+                <button id="theme-toggle" class="secondary-btn"><i class="fas fa-moon"></i></button>
                 <button id="logout-button" class="secondary-btn">تسجيل الخروج</button>
             </div>
         </header>
         <main>
             <div class="toolbar">
                 <h2>مجلداتك</h2>
-                <button id="add-folder-button" class="primary-btn">+ مجلد جديد</button>
+                <button id="add-folder-button" class="primary-btn"><i class="fas fa-plus"></i> مجلد جديد</button>
             </div>
             <div id="folders-list" class="grid-container">
-                <!-- المجلدات ستُعرض هنا عبر JavaScript -->
+                <!-- المجلدات ستُعرض هنا -->
             </div>
         </main>
-        <!-- Bottom Navigation Bar for Mobile -->
         <nav class="bottom-nav">
             <button class="nav-item active" data-view="folders">
-                <span class="icon">📁</span>
-                <span class="text">المجلدات</span>
+                <i class="fas fa-folder"></i>
+                <span>المجلدات</span>
             </button>
             <button class="nav-item" data-view="recent">
-                <span class="icon">🕒</span>
-                <span class="text">الحديثة</span>
+                <i class="fas fa-clock"></i>
+                <span>الحديثة</span>
             </button>
             <button class="nav-item" data-view="favorites">
-                <span class="icon">⭐</span>
-                <span class="text">المفضلة</span>
+                <i class="fas fa-star"></i>
+                <span>المفضلة</span>
             </button>
             <button class="nav-item" data-view="settings">
-                <span class="icon">⚙️</span>
-                <span class="text">الإعدادات</span>
+                <i class="fas fa-cog"></i>
+                <span>الإعدادات</span>
             </button>
         </nav>
     </div>
@@ -84,44 +83,234 @@
     <!-- 3. واجهة عرض محتويات المجلد -->
     <div id="folder-content-view" class="view hidden">
         <header class="glassmorphism-header">
+            <button id="back-to-folders-button" class="back-button">
+                <i class="fas fa-arrow-right"></i>
+            </button>
             <h1 id="folder-title-placeholder"></h1>
             <div class="header-controls">
-                <button id="back-to-folders-button" class="secondary-btn">العودة للمجلدات</button>
-                <button id="theme-toggle-inner" class="secondary-btn">تبديل الوضع</button>
+                <button id="theme-toggle-inner" class="secondary-btn"><i class="fas fa-moon"></i></button>
                 <button id="logout-button-inner" class="secondary-btn">تسجيل الخروج</button>
             </div>
         </header>
         <main>
-             <div class="toolbar">
+            <div class="toolbar">
                 <h2 id="current-folder-name">محتويات المجلد</h2>
-                <button id="add-file-button" class="primary-btn">+ إضافة عنصر</button>
+                <button id="add-file-button" class="primary-btn"><i class="fas fa-plus"></i> إضافة عنصر</button>
             </div>
             <div id="files-list" class="grid-container">
                 <!-- الملفات ستُعرض هنا -->
             </div>
         </main>
-        <!-- Bottom Navigation Bar for Mobile (also in folder view) -->
         <nav class="bottom-nav">
-            <button class="nav-item active" data-view="folders">
-                <span class="icon">📁</span>
-                <span class="text">المجلدات</span>
+            <button class="nav-item" data-view="folders">
+                <i class="fas fa-folder"></i>
+                <span>المجلدات</span>
             </button>
             <button class="nav-item" data-view="recent">
-                <span class="icon">🕒</span>
-                <span class="text">الحديثة</span>
+                <i class="fas fa-clock"></i>
+                <span>الحديثة</span>
             </button>
             <button class="nav-item" data-view="favorites">
-                <span class="icon">⭐</span>
-                <span class="text">المفضلة</span>
+                <i class="fas fa-star"></i>
+                <span>المفضلة</span>
             </button>
             <button class="nav-item" data-view="settings">
-                <span class="icon">⚙️</span>
-                <span class="text">الإعدادات</span>
+                <i class="fas fa-cog"></i>
+                <span>الإعدادات</span>
             </button>
         </nav>
     </div>
 
-    <!-- النوافذ المنبثقة (Modals) -->
+    <!-- 4. صفحة المفضلات -->
+    <div id="favorites-view" class="view hidden">
+        <header class="glassmorphism-header">
+            <button id="back-from-favorites" class="back-button">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h1>المفضلة</h1>
+            <div class="header-controls">
+                <button id="theme-toggle-fav" class="secondary-btn"><i class="fas fa-moon"></i></button>
+                <button id="logout-button-fav" class="secondary-btn">تسجيل الخروج</button>
+            </div>
+        </header>
+        <main>
+            <div class="toolbar">
+                <h2>عناصرك المفضلة</h2>
+            </div>
+            <div id="favorites-list" class="grid-container">
+                <!-- العناصر المفضلة ستُعرض هنا -->
+            </div>
+        </main>
+        <nav class="bottom-nav">
+            <button class="nav-item" data-view="folders">
+                <i class="fas fa-folder"></i>
+                <span>المجلدات</span>
+            </button>
+            <button class="nav-item" data-view="recent">
+                <i class="fas fa-clock"></i>
+                <span>الحديثة</span>
+            </button>
+            <button class="nav-item active" data-view="favorites">
+                <i class="fas fa-star"></i>
+                <span>المفضلة</span>
+            </button>
+            <button class="nav-item" data-view="settings">
+                <i class="fas fa-cog"></i>
+                <span>الإعدادات</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- 5. صفحة العناصر الحديثة -->
+    <div id="recent-view" class="view hidden">
+        <header class="glassmorphism-header">
+            <button id="back-from-recent" class="back-button">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h1>العناصر الحديثة</h1>
+            <div class="header-controls">
+                <button id="theme-toggle-recent" class="secondary-btn"><i class="fas fa-moon"></i></button>
+                <button id="logout-button-recent" class="secondary-btn">تسجيل الخروج</button>
+            </div>
+        </header>
+        <main>
+            <div class="toolbar">
+                <h2>آخر العناصر المضافة</h2>
+            </div>
+            <div id="recent-list" class="grid-container">
+                <!-- العناصر الحديثة ستُعرض هنا -->
+            </div>
+        </main>
+        <nav class="bottom-nav">
+            <button class="nav-item" data-view="folders">
+                <i class="fas fa-folder"></i>
+                <span>المجلدات</span>
+            </button>
+            <button class="nav-item active" data-view="recent">
+                <i class="fas fa-clock"></i>
+                <span>الحديثة</span>
+            </button>
+            <button class="nav-item" data-view="favorites">
+                <i class="fas fa-star"></i>
+                <span>المفضلة</span>
+            </button>
+            <button class="nav-item" data-view="settings">
+                <i class="fas fa-cog"></i>
+                <span>الإعدادات</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- 6. صفحة الإعدادات -->
+    <div id="settings-view" class="view hidden">
+        <header class="glassmorphism-header">
+            <button id="back-from-settings" class="back-button">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h1>الإعدادات</h1>
+            <div class="header-controls">
+                <button id="theme-toggle-settings" class="secondary-btn"><i class="fas fa-moon"></i></button>
+                <button id="logout-button-settings" class="secondary-btn">تسجيل الخروج</button>
+            </div>
+        </header>
+        <main>
+            <div class="settings-container">
+                <div class="settings-section">
+                    <h3>المظهر</h3>
+                    <div class="setting-item">
+                        <label>المظهر:</label>
+                        <select id="theme-select">
+                            <option value="light">فاتح</option>
+                            <option value="dark">داكن</option>
+                            <option value="auto">تلقائي</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>التخزين</h3>
+                    <div class="setting-item">
+                        <label>مساحة التخزين المستخدمة:</label>
+                        <span id="storage-used">0 MB</span>
+                    </div>
+                    <div class="setting-item">
+                        <label>المساحة المتاحة:</label>
+                        <span id="storage-available">1000 MB</span>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>الحساب</h3>
+                    <div class="setting-item">
+                        <label>البريد الإلكتروني:</label>
+                        <span id="user-email-settings">user@example.com</span>
+                    </div>
+                    <button class="secondary-btn" id="change-password-btn">تغيير كلمة المرور</button>
+                </div>
+
+                <div class="settings-section">
+                    <h3>حول التطبيق</h3>
+                    <div class="setting-item">
+                        <label>الإصدار:</label>
+                        <span>1.0.0</span>
+                    </div>
+                    <button class="secondary-btn" id="privacy-btn">سياسة الخصوصية</button>
+                    <button class="secondary-btn" id="terms-btn">شروط الخدمة</button>
+                </div>
+            </div>
+        </main>
+        <nav class="bottom-nav">
+            <button class="nav-item" data-view="folders">
+                <i class="fas fa-folder"></i>
+                <span>المجلدات</span>
+            </button>
+            <button class="nav-item" data-view="recent">
+                <i class="fas fa-clock"></i>
+                <span>الحديثة</span>
+            </button>
+            <button class="nav-item" data-view="favorites">
+                <i class="fas fa-star"></i>
+                <span>المفضلة</span>
+            </button>
+            <button class="nav-item active" data-view="settings">
+                <i class="fas fa-cog"></i>
+                <span>الإعدادات</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- 7. مشغل الوسائط -->
+    <div id="media-viewer" class="view hidden">
+        <header class="glassmorphism-header">
+            <button id="back-from-media" class="back-button">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h1 id="media-title"></h1>
+            <div class="header-controls">
+                <button id="download-media" class="secondary-btn"><i class="fas fa-download"></i></button>
+                <button id="favorite-media" class="secondary-btn"><i class="far fa-star"></i></button>
+            </div>
+        </header>
+        <main class="media-container">
+            <div id="image-viewer" class="hidden">
+                <img id="image-display" src="" alt="صورة">
+            </div>
+            <div id="video-viewer" class="hidden">
+                <video id="video-display" controls>
+                    <source src="" type="video/mp4">
+                    متصفحك لا يدعم تشغيل الفيديو.
+                </video>
+            </div>
+            <div id="pdf-viewer" class="hidden">
+                <iframe id="pdf-display" src="" width="100%" height="600px"></iframe>
+            </div>
+            <div id="text-viewer" class="hidden">
+                <pre id="text-display"></pre>
+            </div>
+        </main>
+    </div>
+
+    <!-- النوافذ المنبثقة -->
     <div id="folder-modal" class="modal hidden">
         <div class="modal-content glassmorphism-card">
             <span class="close-button">&times;</span>
@@ -141,24 +330,41 @@
             <span class="close-button">&times;</span>
             <h3>إضافة عنصر جديد</h3>
             <form id="file-form">
-                 <label for="file-name">اسم العنصر:</label>
-                 <input type="text" id="file-name" required>
-                 <label for="file-type">نوع العنصر:</label>
-                 <select id="file-type">
-                     <option value="note">ملاحظة نصية</option>
-                     <option value="image">صورة</option>
-                     <option value="video">فيديو</option>
-                     <option value="pdf">ملف PDF</option>
-                 </select>
-                 <div id="note-content-wrapper">
+                <label for="file-name">اسم العنصر:</label>
+                <input type="text" id="file-name" required>
+                <label for="file-type">نوع العنصر:</label>
+                <select id="file-type">
+                    <option value="note">ملاحظة نصية</option>
+                    <option value="image">صورة</option>
+                    <option value="video">فيديو</option>
+                    <option value="pdf">ملف PDF</option>
+                    <option value="audio">ملف صوتي</option>
+                </select>
+                <div id="note-content-wrapper">
                     <label for="note-content">المحتوى:</label>
                     <textarea id="note-content" rows="5"></textarea>
-                 </div>
-                 <div id="file-upload-wrapper" class="hidden">
+                </div>
+                <div id="file-upload-wrapper" class="hidden">
                     <label for="file-upload">اختر ملفًا:</label>
-                    <input type="file" id="file-upload">
-                 </div>
-                 <button type="submit" class="primary-btn">حفظ العنصر</button>
+                    <input type="file" id="file-upload" accept="">
+                </div>
+                <button type="submit" class="primary-btn">حفظ العنصر</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="change-password-modal" class="modal hidden">
+        <div class="modal-content glassmorphism-card">
+            <span class="close-button">&times;</span>
+            <h3>تغيير كلمة المرور</h3>
+            <form id="change-password-form">
+                <label for="current-password">كلمة المرور الحالية:</label>
+                <input type="password" id="current-password" required>
+                <label for="new-password">كلمة المرور الجديدة:</label>
+                <input type="password" id="new-password" required minlength="6">
+                <label for="confirm-new-password">تأكيد كلمة المرور الجديدة:</label>
+                <input type="password" id="confirm-new-password" required>
+                <button type="submit" class="primary-btn">تغيير كلمة المرور</button>
             </form>
         </div>
     </div>
@@ -168,10 +374,9 @@
         <div class="spinner"></div>
     </div>
 
-    <!-- JavaScript Files -->
+    <!-- ملفات JavaScript -->
     <script src="supabase-client.js"></script>
     <script src="app.js"></script>
-    <!-- You can add a new JS file here for mobile-specific interactions if needed -->
-    <!-- <script src="mobile-interactions.js"></script> -->
+    <script src="app-functions.js"></script>
 </body>
 </html>

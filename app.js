@@ -379,4 +379,7 @@ window.addEventListener('click', (e) => {
 });
 
 // -- Initial Load --
-document.addEventListener('DOMContentLoaded', checkUser);
+document.addEventListener('DOMContentLoaded', () => {
+    checkUser();
+    setupNavigation(); // ★★★ التعديل هنا ★★★
+});

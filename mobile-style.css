@@ -254,9 +254,9 @@ button:hover {
     font-size: 1.6rem; /* Larger font size */
     color: var(--text-color);
 }
-.toolbar .primary-btn { 
-    width: auto; 
-    margin-top: 0; 
+.toolbar .primary-btn {
+    width: auto;
+    margin-top: 0;
     flex-shrink: 0;
     padding: 0.8rem 1.2rem; /* Smaller padding for toolbar button */
     font-size: 0.95rem;

@@ -1,0 +1,422 @@
+/* --- CSS Variables (لوحة الألوان) --- */
+:root {
+    --primary-color: #4A90E2; /* أزرق عصري */
+    --primary-hover: #357ABD;
+    --background-color: #f4f7f9; /* خلفية رمادية فاتحة جداً */
+    --surface-color: #ffffff; /* لون الأسطح كالبطاقات */
+    --text-color: #333;
+    --text-light: #777;
+    --border-color: #e0e6ed;
+    --danger-color: #e74c3c;
+    --danger-hover: #c0392b;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* --- Global Styles (تنسيقات عامة) --- */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Tajawal', sans-serif;
+    margin: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    direction: rtl;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Layout & Views --- */
+.view {
+    min-height: 100vh;
+    display: flex; /* استخدام flexbox لتوسيط المحتوى */
+    flex-direction: column;
+}
+.hidden {
+    display: none !important;
+}
+
+header {
+    background-color: var(--surface-color);
+    padding: 1rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-wrap: wrap; /* السماح للعناصر بالانتقال إلى سطر جديد */
+    gap: 1rem; /* مسافة بين العناصر في الرأس */
+}
+header h1 {
+    color: var(--primary-color);
+    margin: 0;
+    flex-shrink: 0; /* منع العنوان من الانكماش */
+}
+.header-controls { /* تجميع عناصر التحكم في الهيدر */
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: flex-end; /* محاذاة الأزرار لليمين */
+    flex-grow: 1; /* السماح لها بأخذ المساحة المتاحة */
+}
+
+main {
+    padding: 2.5rem;
+    flex-grow: 1; /* السماح للمحتوى الرئيسي بالتمدد */
+}
+
+/* --- Authentication Screen (شاشة الدخول) --- */
+#auth-view {
+    justify-content: center;
+    align-items: center;
+    /* flex-direction: column; تم نقلها إلى .view */
+    padding: 1rem; /* إضافة padding لضمان عدم التصاق المحتوى بالحواف */
+}
+.auth-container {
+    background: var(--surface-color);
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    margin-top: 1rem;
+}
+.auth-container h2 {
+    margin-top: 0;
+    margin-bottom: 2rem;
+    font-weight: 700;
+}
+.auth-container p { margin-top: 1.5rem; }
+.auth-container a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+.auth-container a:hover { text-decoration: underline; }
+
+/* --- Forms (النماذج) --- */
+form input, form textarea, form select {
+    width: 100%;
+    padding: 0.9rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Tajawal', sans-serif;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+form input:focus, form textarea:focus, form select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+form label {
+    display: block;
+    text-align: right;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+/* --- Buttons (الأزرار) --- */
+button, .btn {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    font-family: 'Tajawal', sans-serif;
+    transition: background-color 0.2s, transform 0.1s;
+    white-space: nowrap; /* منع كسر النص داخل الزر */
+}
+button:hover {
+    transform: translateY(-2px);
+}
+.primary-btn, form button[type="submit"] {
+    background-color: var(--primary-color);
+    color: var(--surface-color);
+    width: 100%;
+    margin-top: 1rem;
+}
+.primary-btn:hover, form button[type="submit"]:hover {
+    background-color: var(--primary-hover);
+}
+#logout-button, #logout-button-inner, #back-to-folders-button {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+#logout-button:hover, #logout-button-inner:hover, #back-to-folders-button:hover {
+    background-color: var(--background-color);
+}
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap; /* السماح للعناصر بالانتقال إلى سطر جديد */
+    gap: 1rem; /* مسافة بين العناصر في شريط الأدوات */
+}
+.toolbar h2 {
+    margin: 0; /* إزالة الهامش العلوي والسفلي */
+    flex-shrink: 0;
+}
+.toolbar .primary-btn { 
+    width: auto; 
+    margin-top: 0; 
+    flex-shrink: 0;
+}
+#search-input {
+    min-width: 200px; /* تقليل الحد الأدنى للعرض */
+    flex-grow: 1; /* السماح له بالتمدد */
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+/* --- Cards (البطاقات) --- */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+}
+.card {
+    background-color: var(--surface-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    border: 1px solid transparent;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--primary-color);
+}
+.card h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    word-break: break-word;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.card p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    flex-grow: 1;
+    line-height: 1.5;
+}
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--text-light);
+    padding-top: 1rem;
+    margin-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+.card-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    font-size: 1.1rem;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+.card-actions button:hover {
+    background-color: #f0f0f0;
+}
+.card-actions .delete-file:hover, .card-actions .delete-folder:hover, .card-actions .edit-folder:hover {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: var(--danger-color);
+}
+
+
+/* --- Modal (النافذة المنبثقة) --- */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.modal {
+    position: fixed;
+    z-index: 1000;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    animation: fadeIn 0.3s ease-out;
+}
+.modal-content {
+    background-color: var(--surface-color);
+    padding: 2.5rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    animation: scaleUp 0.3s ease-out;
+}
+.close-button {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-light);
+    transition: background-color 0.2s, color 0.2s;
+}
+.close-button:hover {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+/* --- Spinner --- */
+#loading-spinner {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+.spinner {
+    border: 6px solid var(--border-color);
+    border-top: 6px solid var(--primary-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* --- Responsive Design (تصميم متجاوب) --- */
+
+/* شاشات صغيرة جداً (أقل من 480 بكسل) - الهواتف الصغيرة */
+@media (max-width: 480px) {
+    header {
+        padding: 0.8rem;
+        flex-direction: column;
+        align-items: flex-start; /* محاذاة العناصر لليسار */
+        gap: 0.8rem;
+    }
+    .header-controls {
+        flex-direction: column;
+        width: 100%; /* جعل عناصر التحكم تأخذ عرض كامل */
+        align-items: stretch; /* جعل الأزرار تمتد */
+    }
+    #search-input {
+        min-width: unset; /* إزالة الحد الأدنى للعرض */
+        width: 100%; /* جعل حقل البحث يأخذ عرض كامل */
+    }
+    .toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .toolbar .primary-btn {
+        width: 100%; /* جعل زر الإضافة يأخذ عرض كامل */
+    }
+    main {
+        padding: 1rem;
+    }
+    .auth-container {
+        padding: 1.5rem;
+        margin-top: 0.5rem;
+    }
+    .modal-content {
+        padding: 1.5rem;
+        margin: 0.5rem; /* إضافة هامش حول المودال */
+    }
+    .grid-container {
+        grid-template-columns: 1fr; /* عمود واحد للهواتف */
+        gap: 1rem;
+    }
+    .card {
+        padding: 1rem;
+    }
+    .card-actions button {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+}
+
+/* شاشات متوسطة (481 بكسل - 768 بكسل) - الهواتف الكبيرة والأجهزة اللوحية الصغيرة */
+@media (min-width: 481px) and (max-width: 768px) {
+    header {
+        padding: 1rem 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .header-controls {
+        flex-grow: 1;
+        justify-content: flex-end;
+    }
+    #search-input {
+        min-width: 200px;
+        flex-grow: 1;
+    }
+    .toolbar {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    main {
+        padding: 1.5rem;
+    }
+    .auth-container {
+        padding: 2rem;
+    }
+    .modal-content {
+        padding: 2rem;
+    }
+    .grid-container {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* تعديل حجم البطاقات */
+        gap: 1.5rem;
+    }
+}
+
+/* شاشات كبيرة (أكبر من 768 بكسل) - الأجهزة اللوحية الكبيرة وأجهزة الكمبيوتر */
+@media (min-width: 769px) {
+    header {
+        padding: 1rem 2.5rem;
+    }
+    main {
+        padding: 2.5rem;
+    }
+    .grid-container {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+    }
+    #search-input {
+        min-width: 300px;
+    }
+}

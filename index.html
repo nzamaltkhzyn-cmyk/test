@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الخزنة</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet (New Mobile-First Design) -->
+    <link rel="stylesheet" href="mobile-style.css"> <!-- Changed stylesheet link -->
+
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="theme-light">
+
+    <!-- 1. شاشة المصادقة (تسجيل الدخول / حساب جديد) -->
+    <div id="auth-view" class="view">
+        <div class="auth-container glassmorphism-card">
+            <div id="login-form-container">
+                <h2>تسجيل الدخول إلى الخزنة</h2>
+                <form id="login-form">
+                    <input type="email" id="login-email" placeholder="البريد الإلكتروني" required>
+                    <input type="password" id="login-password" placeholder="كلمة المرور" required>
+                    <button type="submit" class="primary-btn">دخول</button>
+                </form>
+                <p>ليس لديك حساب؟ <a href="#" id="show-signup">أنشئ حسابًا</a></p>
+            </div>
+            <div id="signup-container" style="display: none;"> 
+                <h2>حساب جديد</h2>
+                <form id="signup-form">
+                    <input type="email" id="signup-email" placeholder="البريد الإلكتروني" required>
+                    <input type="password" id="signup-password" placeholder="كلمة المرور" required>
+                    <button type="submit" class="primary-btn">تسجيل</button>
+                </form>
+                <p>لديك حساب بالفعل؟ <a href="#" id="show-login">سجل الدخول</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. الواجهة الرئيسية (عرض المجلدات) -->
+    <div id="main-view" class="view hidden">
+        <header class="glassmorphism-header">
+            <h1>الخزنة</h1>
+            <div class="header-controls">
+                <input type="search" id="search-input" placeholder="ابحث في المجلدات...">
+                <button id="theme-toggle" class="secondary-btn">تبديل الوضع</button>
+                <button id="logout-button" class="secondary-btn">تسجيل الخروج</button>
+            </div>
+        </header>
+        <main>
+            <div class="toolbar">
+                <h2>مجلداتك</h2>
+                <button id="add-folder-button" class="primary-btn">+ مجلد جديد</button>
+            </div>
+            <div id="folders-list" class="grid-container">
+                <!-- المجلدات ستُعرض هنا عبر JavaScript -->
+            </div>
+        </main>
+        <!-- Bottom Navigation Bar for Mobile -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-view="folders">
+                <span class="icon">📁</span>
+                <span class="text">المجلدات</span>
+            </button>
+            <button class="nav-item" data-view="recent">
+                <span class="icon">🕒</span>
+                <span class="text">الحديثة</span>
+            </button>
+            <button class="nav-item" data-view="favorites">
+                <span class="icon">⭐</span>
+                <span class="text">المفضلة</span>
+            </button>
+            <button class="nav-item" data-view="settings">
+                <span class="icon">⚙️</span>
+                <span class="text">الإعدادات</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- 3. واجهة عرض محتويات المجلد -->
+    <div id="folder-content-view" class="view hidden">
+        <header class="glassmorphism-header">
+            <h1 id="folder-title-placeholder"></h1>
+            <div class="header-controls">
+                <button id="back-to-folders-button" class="secondary-btn">العودة للمجلدات</button>
+                <button id="theme-toggle-inner" class="secondary-btn">تبديل الوضع</button>
+                <button id="logout-button-inner" class="secondary-btn">تسجيل الخروج</button>
+            </div>
+        </header>
+        <main>
+             <div class="toolbar">
+                <h2 id="current-folder-name">محتويات المجلد</h2>
+                <button id="add-file-button" class="primary-btn">+ إضافة عنصر</button>
+            </div>
+            <div id="files-list" class="grid-container">
+                <!-- الملفات ستُعرض هنا -->
+            </div>
+        </main>
+        <!-- Bottom Navigation Bar for Mobile (also in folder view) -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-view="folders">
+                <span class="icon">📁</span>
+                <span class="text">المجلدات</span>
+            </button>
+            <button class="nav-item" data-view="recent">
+                <span class="icon">🕒</span>
+                <span class="text">الحديثة</span>
+            </button>
+            <button class="nav-item" data-view="favorites">
+                <span class="icon">⭐</span>
+                <span class="text">المفضلة</span>
+            </button>
+            <button class="nav-item" data-view="settings">
+                <span class="icon">⚙️</span>
+                <span class="text">الإعدادات</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- النوافذ المنبثقة (Modals) -->
+    <div id="folder-modal" class="modal hidden">
+        <div class="modal-content glassmorphism-card">
+            <span class="close-button">&times;</span>
+            <h3 id="modal-title">مجلد جديد</h3>
+            <form id="folder-form">
+                <label for="folder-name">اسم المجلد:</label>
+                <input type="text" id="folder-name" required>
+                <label for="folder-description">وصف (اختياري):</label>
+                <textarea id="folder-description" rows="3"></textarea>
+                <button type="submit" class="primary-btn">حفظ</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="file-modal" class="modal hidden">
+        <div class="modal-content glassmorphism-card">
+            <span class="close-button">&times;</span>
+            <h3>إضافة عنصر جديد</h3>
+            <form id="file-form">
+                 <label for="file-name">اسم العنصر:</label>
+                 <input type="text" id="file-name" required>
+                 <label for="file-type">نوع العنصر:</label>
+                 <select id="file-type">
+                     <option value="note">ملاحظة نصية</option>
+                     <option value="image">صورة</option>
+                     <option value="video">فيديو</option>
+                     <option value="pdf">ملف PDF</option>
+                 </select>
+                 <div id="note-content-wrapper">
+                    <label for="note-content">المحتوى:</label>
+                    <textarea id="note-content" rows="5"></textarea>
+                 </div>
+                 <div id="file-upload-wrapper" class="hidden">
+                    <label for="file-upload">اختر ملفًا:</label>
+                    <input type="file" id="file-upload">
+                 </div>
+                 <button type="submit" class="primary-btn">حفظ العنصر</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- دائرة التحميل -->
+    <div id="loading-spinner" class="hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="supabase-client.js"></script>
+    <script src="app.js"></script>
+    <!-- You can add a new JS file here for mobile-specific interactions if needed -->
+    <!-- <script src="mobile-interactions.js"></script> -->
+</body>
+</html>

@@ -120,7 +120,7 @@ const fetchFolders = async (searchTerm = '') => {
         query = query.ilike('name', `%${searchTerm}%`);
     }
     const { data: folders, error } = await query;
-    
+
     if (error) console.error('Error fetching folders:', error);
     else renderFolders(folders);
     hideLoading();
@@ -172,7 +172,7 @@ folderForm.addEventListener('submit', async (e) => {
         description: folderDescriptionInput.value,
         user_id: currentUser.id
     };
-    
+
     let error;
     if (folderIdInput.value) { // Update
         ({ error } = await supabase.from('folders').update(folderData).eq('id', folderIdInput.value));
@@ -217,6 +217,7 @@ foldersList.addEventListener('click', async (e) => {
 const openFolder = (folderId, folderName) => {
     currentFolderId = folderId;
     showView(folderContentView);
+    document.getElementById('folder-title-placeholder').textContent = folderName; // Update header title
     currentFolderName.textContent = `محتويات مجلد: ${folderName}`;
     fetchFiles(folderId);
 };
@@ -236,39 +237,7 @@ const renderFiles = (files) => {
         return;
     }
     files.forEach(file => {
-        let contentPreview = '';
-        let icon = '📄'; // Default icon
-        switch (file.type) {
-            case 'note':
-                contentPreview = file.content.substring(0, 100) + '...';
-                icon = '📝';
-                break;
-            case 'image':
-                contentPreview = 'صورة';
-                icon = '🖼️';
-                break;
-            case 'video':
-                contentPreview = 'فيديو';
-                icon = '🎬';
-                break;
-            case 'pdf':
-                contentPreview = 'ملف PDF';
-                icon = '📑';
-                break;
-        }
-
-        const fileEl = document.createElement('div');
-        fileEl.className = 'card';
-        fileEl.innerHTML = `
-             <h4>${icon} ${file.name}</h4>
-             <p>${contentPreview}</p>
-             <div class="card-footer">
-                <span>${new Date(file.created_at).toLocaleDateString()}</span>
-                <div class="card-actions">
-                    <button class="delete-file" data-id="${file.id}" data-path="${file.file_path || ''}">🗑️</button>
-                </div>
-            </div>
-        `;
+        const fileEl = createFileCard(file, false); // Use createFileCard from app-functions.js
         filesList.appendChild(fileEl);
     });
 };
@@ -284,22 +253,43 @@ addFileButton.addEventListener('click', () => {
     // Reset form state
     noteContentWrapper.classList.remove('hidden');
     fileUploadWrapper.classList.add('hidden');
+    fileTypeSelect.value = 'note'; // Default to note
+    fileUploadInput.value = ''; // Clear selected file
 });
 
 fileTypeSelect.addEventListener('change', () => {
-    if (fileTypeSelect.value === 'note') {
+    const selectedType = fileTypeSelect.value;
+    if (selectedType === 'note') {
         noteContentWrapper.classList.remove('hidden');
         fileUploadWrapper.classList.add('hidden');
+        fileUploadInput.removeAttribute('accept');
     } else {
         noteContentWrapper.classList.add('hidden');
         fileUploadWrapper.classList.remove('hidden');
+        // Set accept attribute based on file type
+        switch (selectedType) {
+            case 'image':
+                fileUploadInput.setAttribute('accept', 'image/*');
+                break;
+            case 'video':
+                fileUploadInput.setAttribute('accept', 'video/*');
+                break;
+            case 'pdf':
+                fileUploadInput.setAttribute('accept', 'application/pdf');
+                break;
+            case 'audio':
+                fileUploadInput.setAttribute('accept', 'audio/*');
+                break;
+            default:
+                fileUploadInput.removeAttribute('accept');
+        }
     }
 });
 
 fileForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     showLoading();
-    
+
     const fileType = fileTypeSelect.value;
     const fileName = fileNameInput.value;
     let fileData = {
@@ -318,14 +308,16 @@ fileForm.addEventListener('submit', async (e) => {
             hideLoading();
             return;
         }
-        const filePath = `${currentUser.id}/${currentFolderId}/${Date.now()}-${file.name}`;
+        const filePath = `${currentUser.id}/${currentFolderId || 'root'}/${Date.now()}-${file.name}`;
         const { error: uploadError } = await supabase.storage.from('uploads').upload(filePath, file);
         if (uploadError) {
             alert('خطأ في رفع الملف: ' + uploadError.message);
             hideLoading();
             return;
         }
-        fileData.file_path = filePath;
+        // Get public URL for the uploaded file
+        const { data: publicURLData } = supabase.storage.from('uploads').getPublicUrl(filePath);
+        fileData.file_path = publicURLData.publicUrl;
     }
 
     const { error: insertError } = await supabase.from('files').insert(fileData);
@@ -339,23 +331,52 @@ fileForm.addEventListener('submit', async (e) => {
 });
 
 filesList.addEventListener('click', async (e) => {
-    if (e.target.classList.contains('delete-file')) {
-        const id = e.target.dataset.id;
-        const path = e.target.dataset.path;
+    const target = e.target;
+    const card = target.closest('.card');
+    if (!card) return;
 
+    const fileId = card.dataset.id;
+    const fileType = card.dataset.type;
+    const fileName = card.dataset.name;
+    const filePath = card.dataset.path;
+    const fileContent = card.dataset.content;
+
+    const file = {
+        id: fileId,
+        name: fileName,
+        type: fileType,
+        file_path: filePath,
+        content: fileContent
+    };
+
+    if (target.classList.contains('delete-file')) {
         if (confirm('هل أنت متأكد من حذف هذا العنصر؟')) {
             showLoading();
-            // 1. Delete file from storage if it exists
-            if (path) {
-                const { error: storageError } = await supabase.storage.from('uploads').remove([path]);
+            // 1. Delete file from storage if it exists and is not a note
+            if (file.file_path && file.type !== 'note') {
+                // Extract path from public URL
+                const pathSegments = file.file_path.split('/');
+                const storagePath = pathSegments.slice(pathSegments.indexOf('public') + 1).join('/');
+                const { error: storageError } = await supabase.storage.from('uploads').remove([storagePath]);
                 if (storageError) console.error('Error deleting from storage:', storageError.message);
             }
             // 2. Delete record from database
-            const { error: dbError } = await supabase.from('files').delete().eq('id', id);
+            const { error: dbError } = await supabase.from('files').delete().eq('id', file.id);
             if (dbError) alert(dbError.message);
             else fetchFiles(currentFolderId);
             hideLoading();
         }
+    } else if (target.classList.contains('favorite-file')) {
+        // Toggle favorite status
+        const isFavorited = toggleFavorite(file.id, file); // From app-functions.js
+        alert(isFavorited ? 'تمت الإضافة إلى المفضلة!' : 'تمت الإزالة من المفضلة!');
+        // Re-render the card to update the favorite icon
+        const updatedCard = createFileCard(file, isFavorited);
+        card.replaceWith(updatedCard);
+    }
+    else {
+        // Open media viewer for the file
+        openMediaViewer(file); // From app-functions.js
     }
 });
 
@@ -371,12 +392,75 @@ closeButtons.forEach(btn => {
     btn.addEventListener('click', () => {
         folderModal.classList.add('hidden');
         fileModal.classList.add('hidden');
+        document.getElementById('change-password-modal').classList.add('hidden');
     });
 });
 window.addEventListener('click', (e) => {
     if (e.target == folderModal) folderModal.classList.add('hidden');
     if (e.target == fileModal) fileModal.classList.add('hidden');
+    if (e.target == document.getElementById('change-password-modal')) document.getElementById('change-password-modal').classList.add('hidden');
 });
 
+// -- Theme Toggle --
+const themeToggleButtons = document.querySelectorAll('#theme-toggle, #theme-toggle-inner, #theme-toggle-fav, #theme-toggle-recent, #theme-toggle-settings');
+themeToggleButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.body.classList.toggle('theme-dark');
+        document.body.classList.toggle('theme-light');
+        const currentTheme = document.body.classList.contains('theme-dark') ? 'dark' : 'light';
+        localStorage.setItem('theme', currentTheme);
+        // Update icon
+        btn.innerHTML = currentTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    });
+});
+
+// Apply saved theme on load
+const savedTheme = localStorage.getItem('theme') || 'light';
+document.body.classList.add(`theme-${savedTheme}`);
+themeToggleButtons.forEach(btn => {
+    btn.innerHTML = savedTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+});
+
+
+// -- Change Password --
+document.getElementById('change-password-btn').addEventListener('click', () => {
+    document.getElementById('change-password-modal').classList.remove('hidden');
+    document.getElementById('change-password-form').reset();
+});
+
+document.getElementById('change-password-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    showLoading();
+    const newPassword = document.getElementById('new-password').value;
+    const confirmNewPassword = document.getElementById('confirm-new-password').value;
+
+    if (newPassword !== confirmNewPassword) {
+        alert('كلمة المرور الجديدة وتأكيدها غير متطابقين.');
+        hideLoading();
+        return;
+    }
+
+    // Supabase does not directly support changing password with current password for security reasons.
+    // It usually involves sending a password reset email.
+    // For simplicity in this example, we'll simulate a direct change (though not how Supabase works for security).
+    // In a real app, you'd use: await supabase.auth.resetPasswordForEmail(currentUser.email);
+    // and then the user follows a link.
+
+    // For this demo, we'll just update the user directly (this is NOT secure for production)
+    const { data, error } = await supabase.auth.updateUser({ password: newPassword });
+
+    if (error) {
+        alert('خطأ في تغيير كلمة المرور: ' + error.message);
+    } else {
+        alert('تم تغيير كلمة المرور بنجاح!');
+        document.getElementById('change-password-modal').classList.add('hidden');
+    }
+    hideLoading();
+});
+
+
 // -- Initial Load --
-document.addEventListener('DOMContentLoaded', checkUser);
+document.addEventListener('DOMContentLoaded', () => {
+    checkUser();
+    setupNavigation(); // From app-functions.js
+});

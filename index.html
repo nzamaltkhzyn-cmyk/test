@@ -316,6 +316,7 @@
             <span class="close-button">&times;</span>
             <h3 id="modal-title">مجلد جديد</h3>
             <form id="folder-form">
+                <input type="hidden" id="folder-id">
                 <label for="folder-name">اسم المجلد:</label>
                 <input type="text" id="folder-name" required>
                 <label for="folder-description">وصف (اختياري):</label>
@@ -375,8 +376,9 @@
     </div>
 
     <!-- ملفات JavaScript -->
+    <!-- ★★★ التعديل هنا: تم تغيير ترتيب الملفين التاليين ★★★ -->
     <script src="supabase-client.js"></script>
-    <script src="app.js"></script>
-    <script src="app-functions.js"></script>
+    <script src="app-functions.js"></script> <!-- يجب أن يأتي هذا أولاً -->
+    <script src="app.js"></script> <!-- ثم يأتي هذا -->
 </body>
 </html>
